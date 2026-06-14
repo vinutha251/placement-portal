@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PlacementPrepHub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f1f5f9; min-height: 100vh; color: #1e293b; }
+
+        .navbar { background: #1e293b; padding: 0 32px; display: flex; justify-content: space-between; align-items: center; height: 64px; position: sticky; top: 0; z-index: 100; }
+        .logo { color: #60a5fa; font-size: 1.3rem; font-weight: 800; }
+        .nav-links { display: flex; gap: 8px; align-items: center; }
+        .nav-btn { padding: 8px 18px; border-radius: 8px; font-weight: 600; cursor: pointer; background: transparent; border: none; color: #94a3b8; font-size: 0.9rem; transition: all 0.2s; }
+        .nav-btn:hover { background: #334155; color: white; }
+        .nav-btn.active { background: #3b82f6; color: white; }
+        .logout-btn { background: #ef4444; color: white; padding: 8px 18px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 0.9rem; margin-left: 8px; }
+
+        .container { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+        .welcome-banner { background: linear-gradient(135deg, #1e40af, #7c3aed); color: white; padding: 28px 32px; border-radius: 16px; margin-bottom: 28px; }
+        .welcome-banner h1 { font-size: 1.6rem; margin-bottom: 6px; }
+        .welcome-banner p { opacity: 0.85; }
+
+        .card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 1px 4px rgba(0,0,0,0.08); margin-bottom: 24px; }
+        .card h3 { font-size: 1.1rem; margin-bottom: 20px; color: #1e293b; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; margin-bottom: 24px; }
+        .stat-card { background: white; border-radius: 16px; padding: 24px; border: 1px solid #e2e8f0; }
+        .stat-card h4 { color: #64748b; font-size: 0.8rem; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .stat-number { font-size: 2.8rem; font-weight: 800; color: #1e293b; line-height: 1; }
+        .stat-sub { color: #64748b; font-size: 0.88rem; margin-top: 6px; }
+
+        .progress-bar { background: #e2e8f0; border-radius: 99px; height: 10px; overflow: hidden; margin: 10px 0 6px; }
+        .progress-fill { background: linear-gradient(90deg, #3b82f6, #8b5cf6); height: 100%; border-radius: 99px; transition: width 0.6s ease; }
+        .progress-fill.green { background: linear-gradient(90deg, #10b981, #06b6d4); }
+
+        .topic-row { display: flex; justify-content: space-between; align-items: center; padding: 14px 0; border-bottom: 1px solid #f1f5f9; }
+        .topic-row:last-child { border-bottom: none; }
+        .topic-name { font-weight: 600; }
+        .topic-count { color: #64748b; font-size: 0.85rem; margin-top: 2px; }
+
+        .filters { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+        .filter-btn { padding: 7px 18px; border-radius: 99px; border: 1.5px solid #e2e8f0; background: white; cursor: pointer; font-size: 0.85rem; font-weight: 600; color: #475569; transition: all 0.2s; }
+        .filter-btn:hover { border-color: #3b82f6; color: #3b82f6; }
+        .filter-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; }
+
+        .table-wrap { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
+        th { text-align: left; padding: 10px 12px; background: #f8fafc; color: #64748b; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 14px 12px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+        tr:hover td { background: #fafafa; }
+        tr:last-child td { border-bottom: none; }
+
+        .badge { padding: 3px 12px; border-radius: 99px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
+        .badge.easy { background: #dcfce7; color: #15803d; }
+        .badge.medium { background: #fef3c7; color: #b45309; }
+        .badge.hard { background: #fee2e2; color: #b91c1c; }
+
+        .leetcode-link { color: #f97316; text-decoration: none; font-weight: 600; font-size: 0.85rem; }
+        .leetcode-link:hover { text-decoration: underline; }
+        .mark-btn { background: #3b82f6; color: white; border: none; padding: 6px 16px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-weight: 600; }
+        .mark-btn:hover { background: #2563eb; }
+        .done-badge { color: #10b981; font-weight: 700; font-size: 0.85rem; }
+
+        .quiz-q { background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 16px; border: 1px solid #e2e8f0; }
+        .quiz-q-text { font-weight: 600; margin-bottom: 14px; line-height: 1.5; }
+        .quiz-option { padding: 10px 16px; margin: 6px 0; border-radius: 8px; background: white; border: 1.5px solid #e2e8f0; cursor: pointer; transition: all 0.15s; font-size: 0.9rem; user-select: none; }
+        .quiz-option:hover { border-color: #3b82f6; }
+        .quiz-option.selected { background: #3b82f6; color: white; border-color: #3b82f6; }
+        .quiz-option.correct { background: #10b981; color: white; border-color: #10b981; }
+        .quiz-option.wrong { background: #ef4444; color: white; border-color: #ef4444; }
+
+        .submit-btn { background: #3b82f6; color: white; border: none; padding: 12px 32px; border-radius: 10px; font-weight: 700; cursor: pointer; font-size: 0.95rem; }
+        .submit-btn:hover { background: #2563eb; }
+        .result-banner { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 20px 24px; border-radius: 12px; margin-bottom: 24px; text-align: center; }
+        .result-banner h2 { font-size: 1.5rem; }
+
+        .auth-page { min-height: 100vh; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #1e3a5f, #3730a3); padding: 20px; }
+        .auth-card { background: white; border-radius: 20px; padding: 40px; width: 100%; max-width: 440px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+        .auth-logo { text-align: center; font-size: 1.5rem; font-weight: 800; color: #1e40af; margin-bottom: 6px; }
+        .auth-sub { text-align: center; color: #64748b; margin-bottom: 28px; font-size: 0.9rem; }
+        .auth-tabs { display: flex; background: #f1f5f9; border-radius: 10px; padding: 4px; margin-bottom: 24px; gap: 4px; }
+        .auth-tab { flex: 1; padding: 10px; border: none; border-radius: 8px; background: transparent; cursor: pointer; font-weight: 600; color: #64748b; }
+        .auth-tab.active { background: white; color: #1e40af; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; font-weight: 600; margin-bottom: 7px; font-size: 0.9rem; color: #374151; }
+        .input-group input { width: 100%; padding: 11px 16px; border-radius: 10px; border: 1.5px solid #e2e8f0; font-size: 0.95rem; outline: none; }
+        .input-group input:focus { border-color: #3b82f6; }
+        .auth-submit { width: 100%; padding: 13px; background: #1e40af; color: white; border: none; border-radius: 10px; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 8px; }
+        .error-box { background: #fef2f2; border: 1px solid #fecaca; color: #b91c1c; padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; }
+        .success-box { background: #f0fdf4; border: 1px solid #bbf7d0; color: #15803d; padding: 12px 16px; border-radius: 10px; margin-bottom: 16px; }
+        .empty { text-align: center; padding: 48px; color: #94a3b8; }
+        .loading { text-align: center; padding: 48px; color: #64748b; font-size: 1rem; }
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const API = 'http://localhost:8080';
+
+let user = null, tab = 'dashboard', dashboard = null;
+let dsaList = [], dsaTopic = 'Arrays';
+let quizList = [], quizCategory = 'All';
+let quizAnswers = {}, quizResult = null, quizSubmitted = false;
+let authMode = 'login', msg = {};
+
+const TOPICS = ['Arrays','Strings','LinkedList','Trees','Dynamic Programming','Graphs'];
+const QUIZ_CATS = ['All','Maths','Reasoning','Verbal','CS'];
+
+// ── API HELPER ──
+async function api(path, opts = {}) {
+    const r = await fetch(API + path, {
+        headers: { 'Content-Type': 'application/json' },
+        ...opts
+    });
+    const t = await r.text();
+    if (!r.ok) throw new Error(t || r.status);
+    try { return JSON.parse(t); } catch { return t; }
+}
+
+// ── AUTH ──
+async function doLogin() {
+    const email = document.getElementById('l-email').value.trim();
+    const pass = document.getElementById('l-pass').value;
+    if (!email || !pass) { msg = {type:'error', text:'Fill in all fields'}; render(); return; }
+    try {
+        const res = await fetch(`${API}/api/auth/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(pass)}`, { method: 'POST' });
+        const t = await res.text();
+        if (t.includes('successful')) {
+            user = { email };
+            msg = {};
+            await Promise.all([loadDashboard(), loadDSA('Arrays'), loadQuiz()]);
+            tab = 'dashboard';
+        } else {
+            msg = {type:'error', text: t || 'Invalid credentials'};
+        }
+    } catch(e) {
+        msg = {type:'error', text:'Cannot connect to server. Is Spring Boot running on port 8080?'};
+    }
+    render();
+}
+
+async function doRegister() {
+    const name = document.getElementById('r-name').value.trim();
+    const email = document.getElementById('r-email').value.trim();
+    const pass = document.getElementById('r-pass').value;
+    if (!name || !email || !pass) { msg = {type:'error', text:'Fill in all fields'}; render(); return; }
+    try {
+        const t = await api('/api/auth/register', { method:'POST', body: JSON.stringify({name, email, password: pass}) });
+        if (t.includes('successful')) {
+            msg = {type:'success', text:'Account created! Please login.'};
+            authMode = 'login';
+        } else {
+            msg = {type:'error', text: t};
+        }
+    } catch(e) {
+        msg = {type:'error', text: e.message};
+    }
+    render();
+}
+
+function logout() {
+    user = null; dashboard = null; dsaList = []; quizList = [];
+    quizAnswers = {}; quizResult = null; quizSubmitted = false; msg = {};
+    render();
+}
+
+// ── DATA LOADERS ──
+async function loadDashboard() {
+    dashboard = await api(`/api/dashboard/summary?email=${encodeURIComponent(user.email)}`);
+}
+
+async function loadDSA(topic) {
+    dsaTopic = topic;
+    tab = 'dsa';
+    dsaList = await api(`/api/dsa/topic/${encodeURIComponent(topic)}?email=${encodeURIComponent(user.email)}`);
+    render();
+}
+
+async function loadQuiz() {
+    quizList = await api('/api/quiz/all');
+    quizAnswers = {}; quizResult = null; quizSubmitted = false;
+}
+
+async function markDone(id) {
+    try {
+        await api(`/api/dsa/complete/${id}?email=${encodeURIComponent(user.email)}`, { method: 'PUT' });
+        await loadDSA(dsaTopic);
+        await loadDashboard();
+    } catch(e) {
+        alert('Failed to mark complete');
+    }
+}
+
+async function submitQuiz() {
+    const visible = filteredQuiz();
+    const payload = {};
+    visible.forEach(q => { if (quizAnswers[q.id]) payload[q.id] = quizAnswers[q.id]; });
+    if (Object.keys(payload).length === 0) { alert('Answer at least one question first!'); return; }
+    try {
+        quizResult = await api('/api/quiz/submit', { method:'POST', body: JSON.stringify(payload) });
+        quizSubmitted = true;
+        render();
+    } catch(e) {
+        alert('Failed to submit quiz');
+    }
+}
+
+function filteredQuiz() {
+    return quizCategory === 'All' ? quizList : quizList.filter(q => q.category === quizCategory);
+}
+
+function selectOption(qid, opt) {
+    if (quizSubmitted) return;
+    quizAnswers[qid] = opt;
+    render();
+}
+
+// ── RENDER ──
+function render() {
+    document.getElementById('root').innerHTML = user ? renderApp() : renderAuth();
+}
+
+function renderAuth() {
+    const isLogin = authMode === 'login';
+    return `<div class="auth-page"><div class="auth-card">
+        <div class="auth-logo">🎓 PlacementPrepHub</div>
+        <div class="auth-sub">Your placement preparation companion</div>
+        <div class="auth-tabs">
+            <button class="auth-tab ${isLogin?'active':''}" onclick="authMode='login';msg={};render()">Login</button>
+            <button class="auth-tab ${!isLogin?'active':''}" onclick="authMode='register';msg={};render()">Register</button>
+        </div>
+        ${msg.text ? `<div class="${msg.type==='error'?'error-box':'success-box'}">${msg.text}</div>` : ''}
+        ${isLogin ? `
+            <div class="input-group"><label>Email</label><input id="l-email" type="email" placeholder="you@email.com" onkeydown="if(event.key==='Enter')doLogin()"></div>
+            <div class="input-group"><label>Password</label><input id="l-pass" type="password" placeholder="Your password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+            <button class="auth-submit" onclick="doLogin()">Login →</button>
+        ` : `
+            <div class="input-group"><label>Full Name</label><input id="r-name" type="text" placeholder="Your name"></div>
+            <div class="input-group"><label>Email</label><input id="r-email" type="email" placeholder="you@email.com"></div>
+            <div class="input-group"><label>Password</label><input id="r-pass" type="password" placeholder="Create a password"></div>
+            <button class="auth-submit" onclick="doRegister()">Create Account →</button>
+        `}
+    </div></div>`;
+}
+
+function renderApp() {
+    return `
+    <nav class="navbar">
+        <div class="logo">🎓 PlacementPrepHub</div>
+        <div class="nav-links">
+            <button class="nav-btn ${tab==='dashboard'?'active':''}" onclick="tab='dashboard';loadDashboard().then(render)">📊 Dashboard</button>
+            <button class="nav-btn ${tab==='dsa'?'active':''}" onclick="loadDSA(dsaTopic)">💻 DSA Tracker</button>
+            <button class="nav-btn ${tab==='quiz'?'active':''}" onclick="tab='quiz';render()">📝 Quiz</button>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+    <div class="container">
+        <div class="welcome-banner">
+            <h1>👋 Welcome back, ${user.email.split('@')[0]}!</h1>
+            <p>Consistency beats intensity. Keep tracking your progress every day.</p>
+        </div>
+        ${tab==='dashboard' ? renderDashboard() : ''}
+        ${tab==='dsa'       ? renderDSA()       : ''}
+        ${tab==='quiz'      ? renderQuizPage()  : ''}
+    </div>`;
+}
+
+function renderDashboard() {
+    if (!dashboard) return '<div class="card"><div class="loading">Loading dashboard...</div></div>';
+    const { dsaTotal=0, dsaCompleted=0, dsaPending=0, aptitudeTotalQuestions=0, dsaTopicWise={} } = dashboard;
+    const pct = dsaTotal > 0 ? ((dsaCompleted/dsaTotal)*100).toFixed(1) : 0;
+    return `
+    <div class="stats-grid">
+        <div class="stat-card">
+            <h4>📚 DSA Solved</h4>
+            <div class="stat-number">${dsaCompleted}</div>
+            <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+            <div class="stat-sub">${pct}% of ${dsaTotal} questions</div>
+        </div>
+        <div class="stat-card">
+            <h4>⏳ Remaining</h4>
+            <div class="stat-number">${dsaPending}</div>
+            <div class="stat-sub">questions left to solve</div>
+        </div>
+        <div class="stat-card">
+            <h4>🧠 Aptitude Bank</h4>
+            <div class="stat-number">${aptitudeTotalQuestions}</div>
+            <div class="stat-sub">MCQs to practice</div>
+        </div>
+    </div>
+    <div class="card">
+        <h3>📊 Topic-wise DSA Progress</h3>
+        ${TOPICS.map(t => {
+            const d = dsaTopicWise[t] || {total:0, completed:0};
+            const p = d.total > 0 ? ((d.completed/d.total)*100).toFixed(0) : 0;
+            return `<div class="topic-row">
+                <div>
+                    <div class="topic-name">${t}</div>
+                    <div class="topic-count">${d.completed} of ${d.total} done</div>
+                </div>
+                <div style="width:220px;text-align:right">
+                    <div class="progress-bar"><div class="progress-fill green" style="width:${p}%"></div></div>
+                    <span style="font-size:0.8rem;color:#64748b">${p}%</span>
+                </div>
+            </div>`;
+        }).join('')}
+    </div>`;
+}
+
+function renderDSA() {
+    if (dsaList.length === 0 && dsaTopic) {
+        return `<div class="card"><div class="loading">Loading questions...</div></div>`;
+    }
+    const done = dsaList.filter(q => q.completed).length;
+    return `<div class="card">
+        <h3>💻 DSA Tracker</h3>
+        <div class="filters">
+            ${TOPICS.map(t => `<button class="filter-btn ${dsaTopic===t?'active':''}" onclick="loadDSA('${t}')">${t}</button>`).join('')}
+        </div>
+        <div style="margin-bottom:14px;color:#64748b;font-size:0.9rem">
+            <strong>${dsaList.length}</strong> questions &nbsp;·&nbsp;
+            <strong style="color:#10b981">${done} completed</strong> &nbsp;·&nbsp;
+            <strong style="color:#f97316">${dsaList.length - done} remaining</strong>
+        </div>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>#</th><th>Question</th><th>Difficulty</th><th>Solve</th><th>Status</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                    ${dsaList.map((q, i) => {
+                        const url = q.leetcodeUrl || '';
+                        return `<tr>
+                            <td style="color:#94a3b8;font-size:0.85rem">${i+1}</td>
+                            <td><strong>${q.title}</strong></td>
+                            <td><span class="badge ${(q.difficulty||'').toLowerCase()}">${q.difficulty}</span></td>
+                            <td>${url
+                                ? `<a class="leetcode-link" href="${url}" target="_blank" rel="noopener noreferrer">🔗 Solve on LeetCode →</a>`
+                                : `<span style="color:#94a3b8;font-size:0.85rem">No link</span>`}
+                            </td>
+                            <td>${q.completed
+                                ? '<span class="done-badge">✅ Done</span>'
+                                : '<span style="color:#94a3b8;font-size:0.85rem">⬜ Todo</span>'}</td>
+                            <td>${q.completed
+                                ? '<span style="color:#10b981;font-size:0.85rem">✓ Completed</span>'
+                                : `<button class="mark-btn" onclick="markDone(${q.id})">Mark Done</button>`}</td>
+                        </tr>`;
+                    }).join('')}
+                </tbody>
+            </table>
+        </div>
+    </div>`;
+}
+
+function renderQuizPage() {
+    const visible = filteredQuiz();
+    const answered = visible.filter(q => quizAnswers[q.id]).length;
+    return `<div class="card">
+        <h3>📝 Aptitude Practice Quiz</h3>
+        <div class="filters">
+            ${QUIZ_CATS.map(c => {
+                const count = c === 'All' ? quizList.length : quizList.filter(q => q.category === c).length;
+                return `<button class="filter-btn ${quizCategory===c?'active':''}"
+                    onclick="quizCategory='${c}';quizAnswers={};quizResult=null;quizSubmitted=false;render()">
+                    ${c} (${count})
+                </button>`;
+            }).join('')}
+        </div>
+        <div style="color:#64748b;font-size:0.9rem;margin-bottom:20px">
+            <strong>${visible.length}</strong> questions &nbsp;·&nbsp;
+            <strong style="color:#3b82f6">${answered} answered</strong>
+        </div>
+        ${quizResult ? `
+            <div class="result-banner">
+                <h2>🎉 ${quizResult}</h2>
+                <p>Green = correct answer &nbsp;·&nbsp; Red = your wrong answer</p>
+            </div>` : ''}
+        ${visible.map((q, i) => {
+            const userAns = quizAnswers[q.id];
+            return `<div class="quiz-q">
+                <div class="quiz-q-text">Q${i+1}. ${q.question}</div>
+                ${['A','B','C','D'].map(opt => {
+                    const val = q[`option${opt}`];
+                    if (!val) return '';
+                    let cls = 'quiz-option';
+                    if (quizSubmitted) {
+                        if (opt === q.correctAnswer) cls += ' correct';
+                        else if (opt === userAns && opt !== q.correctAnswer) cls += ' wrong';
+                    } else if (opt === userAns) {
+                        cls += ' selected';
+                    }
+                    const click = quizSubmitted ? '' : `onclick="selectOption(${q.id},'${opt}')"`;
+                    return `<div class="${cls}" ${click}><strong>${opt}.</strong> ${val}</div>`;
+                }).join('')}
+            </div>`;
+        }).join('')}
+        ${!quizSubmitted && visible.length > 0 ? `
+            <button class="submit-btn" onclick="submitQuiz()" style="width:100%;padding:14px;font-size:1rem;margin-top:8px">
+                Submit Quiz & See Score 🚀
+            </button>` : ''}
+        ${quizSubmitted ? `
+            <button class="submit-btn" onclick="quizCategory='All';quizAnswers={};quizResult=null;quizSubmitted=false;render()"
+                style="width:100%;padding:14px;background:#10b981;margin-top:8px">
+                Try Again 🔄
+            </button>` : ''}
+    </div>`;
+}
+
+render();
+</script>
+</body>
+</html>

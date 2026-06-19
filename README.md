@@ -6,6 +6,7 @@ A full-stack web application to help students prepare for campus placements with
 
 - **Frontend**: [https://placement-portal-hub.vercel.app](https://placement-portal-hub.vercel.app)
 - **Backend API**: [https://placement-portal-production-df62.up.railway.app](https://placement-portal-production-df62.up.railway.app)
+video-https://drive.google.com/file/d/1USFy7i4s1e2o3XIPudtWVpPfho3I4JB4/view?usp=drivesdk
 
 > **Note**: Backend may take 30-60 seconds to wake up if inactive (free tier hosting).
 
